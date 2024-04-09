@@ -1,5 +1,6 @@
 ﻿using Mango.Services.CouponAPI.Data;
 using Mango.Services.CouponAPI.Models;
+using Mango.Services.CouponAPI.Models.Dto;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static Azure.Core.HttpHeader;
@@ -11,9 +12,11 @@ namespace Mango.Services.CouponAPI.Controllers
     public class CouponApiController : ControllerBase
     {
         private readonly AppDbContext _db;
+        private ResponseDto  _response;
         public CouponApiController(AppDbContext db)
         {
             _db = db;
+            _response = new ResponseDto();  
             
         }
         [HttpGet]
@@ -22,12 +25,18 @@ namespace Mango.Services.CouponAPI.Controllers
             try
             {
                 var coupons = await _db.Coupons.ToListAsync();
+                _response.Result = coupons;
+                _response.Message = "Retrieved Successfully";
+                return Ok(_response);
 
-                return Ok(coupons); // Returns a 200 OK response with the list of coupons
+
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}"); // Returns a 500 Internal Server Error response
+                _response.IsSuccess = false;
+                _response.Message = ex.Message;
+                return StatusCode(500, _response);
+
             }
         }
 
@@ -38,16 +47,17 @@ namespace Mango.Services.CouponAPI.Controllers
             try
             {
                 var coupons = await _db.Coupons.FirstAsync(u=>u.CouponId==id);
-                if (coupons == null)
-                {
-                    return NotFound(); // Returns a 404 Not Found response if the coupon with the specified id is not found
-                }
+                _response.Result = coupons;
+                _response.Message = "Retrieved Successfully";
 
-                return Ok(coupons); // Returns a 200 OK response with the list of coupons
+
+                return Ok(_response);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}"); // Returns a 500 Internal Server Error response
+                _response.IsSuccess = false;
+                _response.Message = ex.Message;
+                return StatusCode(500, _response);
             }
         }
     }

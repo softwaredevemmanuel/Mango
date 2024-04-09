@@ -1,4 +1,5 @@
-﻿using Mango.Services.CouponAPI.Data;
+﻿using AutoMapper;
+using Mango.Services.CouponAPI.Data;
 using Mango.Services.CouponAPI.Models;
 using Mango.Services.CouponAPI.Models.Dto;
 using Microsoft.AspNetCore.Mvc;
@@ -13,9 +14,11 @@ namespace Mango.Services.CouponAPI.Controllers
     {
         private readonly AppDbContext _db;
         private ResponseDto  _response;
-        public CouponApiController(AppDbContext db)
+        private IMapper _mapper;
+        public CouponApiController(AppDbContext db, IMapper mapper)
         {
             _db = db;
+            _mapper = mapper;
             _response = new ResponseDto();  
             
         }
@@ -25,7 +28,7 @@ namespace Mango.Services.CouponAPI.Controllers
             try
             {
                 var coupons = await _db.Coupons.ToListAsync();
-                _response.Result = coupons;
+                _response.Result = _mapper.Map<List <CouponDto>> (coupons);
                 _response.Message = "Retrieved Successfully";
                 return Ok(_response);
 
@@ -47,7 +50,8 @@ namespace Mango.Services.CouponAPI.Controllers
             try
             {
                 var coupons = await _db.Coupons.FirstAsync(u=>u.CouponId==id);
-                _response.Result = coupons;
+                
+                _response.Result = _mapper.Map <CouponDto> (coupons);
                 _response.Message = "Retrieved Successfully";
 
 

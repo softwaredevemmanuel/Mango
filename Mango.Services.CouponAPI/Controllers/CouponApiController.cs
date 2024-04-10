@@ -8,7 +8,7 @@ using static Azure.Core.HttpHeader;
 
 namespace Mango.Services.CouponAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/coupon")]
     [ApiController]
     public class CouponApiController : ControllerBase
     {
